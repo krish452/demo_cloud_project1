@@ -64,6 +64,45 @@ Resources:
           ToPort: 80
           CidrIp: 0.0.0.0/0
   
+  EC2S3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3UploadAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::my-secure-team-upload-bucket
+                  - !Sub arn:aws:s3:::my-secure-team-upload-bucket/*
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2S3AccessRole
+
+  S3UploadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-secure-team-upload-bucket
+      AccessControl: Private
+      Tags:
+        - Key: Name
+          Value: UploadBucket
+
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -71,9 +110,17 @@ Resources:
       ImageId: ami-0da6daf5e3e5ea2a8
       KeyName: my-key-pair
       SubnetId: !Ref PublicSubnet
+      IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroupIds:
         - !Ref EC2SecurityGroup
       Tags:
         - Key: Name 
           Value: CloudFormationEC2Instance
   
+Outputs:
+  InstancePublicIP:
+    Description: Public IP of the EC2 Instance
+    Value: !GetAtt EC2Instance.PublicIp
+  BucketName:
+    Description: S3 Bucket for uploads
+    Value: !Ref S3UploadBucket
