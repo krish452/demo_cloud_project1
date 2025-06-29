@@ -1,0 +1,8 @@
+---
+stack_name: CloudDeploymentStack
+template_file: template.yaml
+capabilities: []
+parameters: {}
+tags:
+  - Project: GitSyncDemo
+  - Owner: cf-user
