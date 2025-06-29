@@ -1,3 +1,4 @@
-template-file-path: template.yaml
+stackName: stack1-demo
+templateFile: template.yaml
 parameters: {}
 tags: {}
