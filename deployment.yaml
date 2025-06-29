@@ -1,5 +1,7 @@
-template-file-path: template.yaml
+stackName: CloudFormationDeploymentStack
+templateFile: template.yaml
 parameters: {}
 tags:
   Project: GitSyncDemo
   Owner: cf-user
+capabilities: []
